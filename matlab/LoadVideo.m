@@ -1,6 +1,7 @@
 function [ vid ] = LoadVideo( videoNumber )
 %LoadVideo loads the video run for testing
-    vid=VideoReader(strcat('../data/BuggyRun', videoNumber, '.avi'));
+    %vid = VideoReader('../data/BuggyRun1.mov');
+    vid = VideoReader(strcat('../data/BuggyRun', int2str(videoNumber), '.mov'));
     %numFrames = vid.NumberOfFrames;
     %frames = read(vid,i);
 
