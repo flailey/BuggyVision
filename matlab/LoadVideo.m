@@ -1,8 +1,8 @@
-vid=VideoReader('video.avi');
-numFrames = vid.NumberOfFrames;
-n=numFrames;
-for i = 1:n
-frames = read(vid,i);
-imwrite(frames,[''Image' int2str(i), '.jpg']);
-im(i)=image(frames);
+function [ vid ] = LoadVideo( videoNumber )
+%LoadVideo loads the video run for testing
+    vid=VideoReader(strcat('../data/BuggyRun', videoNumber, '.avi'));
+    %numFrames = vid.NumberOfFrames;
+    %frames = read(vid,i);
+
 end
+
