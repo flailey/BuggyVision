@@ -37,8 +37,8 @@ end
 t = -1*R*[x1mean; y1mean] + [x2mean; y2mean];
 
 %% put it together
-H = [ R, t ];
-     %0,0,1];
+H = [ R, t;
+     0,0,1];
 
 end
 
