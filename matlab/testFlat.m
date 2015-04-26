@@ -20,23 +20,22 @@ wFrame2 = transformToFlat(frame2);
 wFrame1 = imresize(wFrame1, 0.1);
 wFrame2 = imresize(wFrame2, 0.1);
 
-figure(101);
-imshow(wFrame1);
+%figure(101);
+%imshow(wFrame1);
 
-figure(102);
-imshow(wFrame2);
+%figure(102);
+%imshow(wFrame2);
 
 
-figure(103);
-imshow(mask);
+%figure(103);
 %displayFeatures(wFrame1);
-figure(104);
-displayFeatures(wFrame2);
-
-
-
-%pan = generatePanorama(wFrame2, wFrame1);
-
 %figure(104);
-%imshow(pan);
+%displayFeatures(wFrame2);
+
+
+
+pan = generatePanorama(wFrame2, wFrame1);
+
+figure(104);
+imshow(pan);
 

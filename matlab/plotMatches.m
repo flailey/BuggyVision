@@ -16,9 +16,9 @@ lx = [pts(1,:); pts(3,:)+size(img1,2)];
 ly = [pts(2,:); pts(4,:)];
 
 perm = randperm(size(pts,2)) ;
-sel = perm(1:50) ;
+%sel = perm(1:50) ;
 
-line(lx(:,sel),ly(:,sel),'Color','g');
+line(lx(:,perm),ly(:,perm),'Color','g');
 
 
 end

@@ -12,7 +12,7 @@
 % usage: im3 = generatePanorama(im1, im2)
 
 function im3 = generatePanorama(im1, im2)
-    ratio = 0.1;
+    ratio = 0.99;
     img1 = im2double(im1);
     img1 = rgb2gray(img1);
     img2 = im2double(im2);
@@ -24,6 +24,9 @@ function im3 = generatePanorama(im1, im2)
     
     nIter = 100;
     tol = 0.01;
+    
+    %figure(103);
+    %plotMatches(im1, im2, matches);
     
     [~, ~, inliers] = ransacH(matches, l1, l2, nIter, tol);
     
