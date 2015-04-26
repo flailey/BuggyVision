@@ -1,10 +1,6 @@
 vid = loadVideo(2);
 
-<<<<<<< HEAD
 fNum = 1400; % 1300
-=======
-fNum = 1420;
->>>>>>> fd251aecfff05bbede97e7b8744d17ca9731efde
 
 frame1 = read(vid,fNum);
 
@@ -24,7 +20,6 @@ wFrame2 = transformToFlat(frame2);
 wFrame1 = imresize(wFrame1, 0.3);
 wFrame2 = imresize(wFrame2, 0.3);
 
-<<<<<<< HEAD
 %figure(101);
 I = rgb2gray(wFrame1);
 %points = detectBRISKFeatures(I);
@@ -70,10 +65,8 @@ showMatchedFeatures(wFrame1, wFrame2,matchedPoints1,matchedPoints2,'montage','Pa
 title(ax, 'Candidate point matches');
 legend(ax, 'Matched points 1','Matched points 2');
 
-=======
 figure(101);
 imshow(wFrame1);
->>>>>>> fd251aecfff05bbede97e7b8744d17ca9731efde
 
 figure(102);
 imshow(wFrame2);
