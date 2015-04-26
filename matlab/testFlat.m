@@ -1,6 +1,6 @@
 vid = loadVideo(2);
 
-fNum = 3600;
+fNum = 1420;
 
 frame1 = read(vid,fNum);
 
@@ -14,17 +14,17 @@ mask = im2bw(mask,0.5);
 wFrame1 = transformToFlat(frame1);
 imwrite(wFrame1,'flat1.png');
 
-frame2 = read(vid,fNum + 10);
+frame2 = read(vid,fNum + 2);
 wFrame2 = transformToFlat(frame2);
 
-wFrame1 = imresize(wFrame1, 0.1);
-wFrame2 = imresize(wFrame2, 0.1);
+wFrame1 = imresize(wFrame1, 0.3);
+wFrame2 = imresize(wFrame2, 0.3);
 
-%figure(101);
-%imshow(wFrame1);
+figure(101);
+imshow(wFrame1);
 
-%figure(102);
-%imshow(wFrame2);
+figure(102);
+imshow(wFrame2);
 
 
 %figure(103);
@@ -35,8 +35,8 @@ wFrame2 = imresize(wFrame2, 0.1);
 
 
 %pan = generatePanorama(wFrame2, wFrame1);
-pan = stitchImages(wFrame2, wFrame1);
+%pan = stitchImages(wFrame2, wFrame1);
 
-figure(104);
-imshow(pan);
+%figure(104);
+%imshow(pan);
 
