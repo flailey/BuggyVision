@@ -6,6 +6,7 @@ resizeto = 0.3;
 cropHeight = 150;
 cropWindow = [1, cropHeight, 854, 480-cropHeight];
 
+
 % load mask
 mask = imread('../data/buggyMask1.png');
 mask = imresize(mask, resizeto);
