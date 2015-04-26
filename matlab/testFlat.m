@@ -34,7 +34,8 @@ wFrame2 = imresize(wFrame2, 0.1);
 
 
 
-pan = generatePanorama(wFrame2, wFrame1);
+%pan = generatePanorama(wFrame2, wFrame1);
+pan = stitchImages(wFrame2, wFrame1);
 
 figure(104);
 imshow(pan);
