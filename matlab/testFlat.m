@@ -1,6 +1,6 @@
-vid = loadVideo(1);
+vid = loadVideo(2);
 
-fNum = 1300;
+fNum = 3600;
 
 frame1 = read(vid,fNum);
 
