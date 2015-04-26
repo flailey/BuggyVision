@@ -8,6 +8,7 @@ cropWindow = [1, cropHeight, size(frame1,2), size(frame1,1)-cropHeight];
 
 
 frame1 = imcrop(frame1,cropWindow);
+imwrite(frame1,'frame1.png');
 
 mask = imread('../data/buggyMask1.png');
 mask = imresize(mask, 0.1);

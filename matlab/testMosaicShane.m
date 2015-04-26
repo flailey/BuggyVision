@@ -12,7 +12,7 @@ mask = im2bw(mask,0.5);
 %imagesc(frame);
 
 wFrame1 = transformToFlat(frame1);
-imwrite(wFrame1,'flat1.png');
+
 
 frame2 = read(vid,fNum + 2);
 wFrame2 = transformToFlat(frame2);
