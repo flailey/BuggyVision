@@ -1,6 +1,6 @@
 vid = loadVideo(2);
 
-fNum = 1350; % 1300
+fNum = 2450; % 1300
 
 frame1 = read(vid,fNum);
 
@@ -17,20 +17,20 @@ wFrame1 = transformToFlat(frame1);
 frame2 = read(vid,fNum + 2);
 wFrame2 = transformToFlat(frame2);
 
-frame1 = imresize(frame1, 0.1);
-frame2 = imresize(frame2, 0.1);
+frame1 = imresize(frame1, 0.3);
+frame2 = imresize(frame2, 0.3);
 
 %wFrame1 = imresize(wFrame1, 0.5);
 %wFrame2 = imresize(wFrame2, 0.5);
 
 figure(101);
 I = rgb2gray(frame1);
-%points = detectBRISKFeatures(I);
+points = detectBRISKFeatures(I);
 %corners = detectFASTFeatures(I);
 %regions = detectMSERFeatures(I);
 %points = detectSURFFeatures(I);
 %points = detectHarrisFeatures(I);
-points = detectMinEigenFeatures(I);
+%points = detectMinEigenFeatures(I);
 %[f1, vpts1, hogVisualization] = extractHOGFeatures(wFrame1, regions);
 [f1, vpts1] = extractFeatures(I, points);
 imshow(frame1); hold on;
@@ -44,9 +44,9 @@ plot(points.selectStrongest(1000));
 
 figure(102);
 I2 = rgb2gray(frame2);
-%points2 = detectBRISKFeatures(I2);
+points2 = detectBRISKFeatures(I2);
 %points2 = detectHarrisFeatures(I);
-points2 = detectMinEigenFeatures(I);
+%points2 = detectMinEigenFeatures(I2);
 %corners2 = detectFASTFeatures(I2);
 %regions2 = detectMSERFeatures(I2);
 %points2 = detectSURFFeatures(I2);
