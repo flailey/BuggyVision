@@ -80,6 +80,7 @@ for i = 1:10:numFrames
     %plot(regions, 'showPixelList', true, 'showEllipses', false);
     %plot(points.selectStrongest(10));
     %plot(hogVisualization);
+    bigFlatFrame1 = transformToFlatMobot(bigframe1,tilt * scale / bigScale,0);
     
     if(i > 1)
     indexPairs = matchFeatures(f1, f2,'MatchThreshold',50);
@@ -107,9 +108,9 @@ for i = 1:10:numFrames
     %wI1 = warpH(frame1,double(bestH),size(I1),0);
     [bestH, bestError, inliers] = ransacAffineH(matches, locs1, locs2, nIter, tol);
     %findTransform([locs1';locs2']);
-    bestH(1:2,3) = bestH(1:2,3)./scale * bigScale;
+    bestH(1:2,3) = bestH(1:2,3).*(1/scale) * bigScale;
     %bestH(3,:) = [0,0,1];
-    bigFlatFrame1 = transformToFlatMobot(bigframe1,tilt * scale / bigScale,0);
+    
     wI1 = affineH(bigFlatFrame1, double(bestH), size(bigFlatFrame1),0);
     
     % visualize ransac'd points
@@ -126,18 +127,34 @@ for i = 1:10:numFrames
     fprintf('gogogo\n');
     %imshow(transformToFlatMobot(bigframe1,tilt * scale,0));
     mp1 = matchedPoints1(indicies);
-    mp1.Location = mp1.Location .* (1/scale);
+    mp1.Location = mp1.Location .* (1/scale) * bigScale;
     mp2 = matchedPoints2(indicies);
-    mp2.Location = mp2.Location .* (1/scale);
-    %showMatchedFeatures(wI1, transformToFlatMobot(bigframe2, tilt * scale, 0), mp1, mp2,'Parent',ax);
+    mp2.Location = mp2.Location .* (1/scale) * bigScale;
+    %bigWI1 = affineH(bigFlatFrame1, double(bestH), size(bigFlatFrame1),0);
+    showMatchedFeatures(wI1, bigFlatFrame2, mp1, mp2,'Parent',ax);
     %imshow(p);
     
     %%% pad image to match size of map %%%
     
     mapH = double(mapH * bestH);
     wmap = affineH(bigFlatFrame1, mapH, size(map),0);
-    map = max(map,wmap);
+    
+    %map = max(map,wmap);
+    
+    mask = double(sum(wmap,3) <= 50);
+    f = fspecial('gaussian', size(mask), 5.0); 
+    mask = imfilter(mask, f);
+    %imagesc(mask);
+    mask = uint8(mask > 0.9);
+    
+    map(:,:,1) = map(:,:,1) .* mask;
+    map(:,:,2) = map(:,:,2) .* mask;
+    map(:,:,3) = map(:,:,3) .* mask;
+    
+    map = map + wmap;
+    
     imshow(map);
+    
     
     drawnow;
     
@@ -148,6 +165,7 @@ for i = 1:10:numFrames
     I2 = I1;
     frame2 = frame1;
     bigframe2 = bigframe1;
+    bigFlatFrame2 = bigFlatFrame1;
     
 end
 hold off;
