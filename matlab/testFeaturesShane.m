@@ -65,7 +65,7 @@ for i = 1:10:numFrames
     locs1 = matchedPoints1.Location;
     locs2 = matchedPoints2.Location;
     nIter = 100;
-    tol = 0.1;
+    tol = 5;
     %[bestH, bestError, inliers] = ransacH(matches, locs2, locs1, nIter, tol);
     %p = generatePanorama(I1,I2);
     %pan = stitchImages(I2, I1);
@@ -81,13 +81,17 @@ for i = 1:10:numFrames
     
     
     p = wI1 .* 0.5 + frame2 .*0.5;
-    figure(2);
+    %figure(1);
+    %ax = axes;
+    %showMatchedFeatures(wI1, I2, matchedPoints1, matchedPoints2,'Parent',ax);
+    %figure(2);
+    
     ax = axes;
     showMatchedFeatures(wI1, I2, matchedPoints1(indicies), matchedPoints2(indicies),'Parent',ax);
     %imshow(p);
     drawnow;
     
-    k = waitforbuttonpress;
+    %k = waitforbuttonpress;
     end
     f2 = f1;
     vpts2 = vpts1;
