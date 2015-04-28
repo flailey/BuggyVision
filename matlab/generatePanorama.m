@@ -14,9 +14,9 @@
 function im3 = generatePanorama(im1, im2)
     ratio = 0.99;
     img1 = im2double(im1);
-    img1 = rgb2gray(img1);
+    %img1 = rgb2gray(img1);
     img2 = im2double(im2);
-    img2 = rgb2gray(img2);
+    %img2 = rgb2gray(img2);
     [l1, d1] = brief(img1);
     [l2, d2] = brief(img2);
     

@@ -34,20 +34,7 @@ function [locs,desc] = computeBrief(im, locs, levels, compareX, compareY)
     end
     locs = newLocs;
     
-    % remove locs that are in the masked area
-    mask = imread('../data/buggyMask1.png');
-    mask = imresize(mask, 0.1);
-    mask = im2bw(mask,0.5);
-    newLocs = [0,0,0];
-    [numLocs,~] = size(locs);
-    n = 1;
-    for i = 1:numLocs
-        if((mask(locs(i,1),locs(i,2)) == 0))
-            newLocs(n,:) = locs(i,:);
-            n = n + 1;
-        end
-    end
-    locs = newLocs;
+    
     
     
     [numLocs,~] = size(locs);
