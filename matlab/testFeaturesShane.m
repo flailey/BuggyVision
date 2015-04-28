@@ -10,7 +10,7 @@ numFrames = vid.NumberOfFrames;
 % constants
 tilt = -1 * degtorad(0.05) / scale;
 
-bigScale = 0.5;
+bigScale = 1;
 % known size
 bigFlatSize = [2160 * bigScale, 3480 * bigScale, 3];
 flatWidth = 3480 * bigScale;
@@ -145,7 +145,7 @@ for i = 1:10:numFrames
     f = fspecial('gaussian', size(mask), 5.0); 
     mask = imfilter(mask, f);
     %imagesc(mask);
-    mask = uint8(mask > 0.9);
+    mask = uint8(mask > 0.1);
     
     map(:,:,1) = map(:,:,1) .* mask;
     map(:,:,2) = map(:,:,2) .* mask;
