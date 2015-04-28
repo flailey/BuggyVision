@@ -10,7 +10,7 @@ numFrames = vid.NumberOfFrames;
 % constants
 tilt = -1 * degtorad(0.05) / scale;
 
-bigScale = 0.2;
+bigScale = 0.5;
 % known size
 bigFlatSize = [2160 * bigScale, 3480 * bigScale, 3];
 flatWidth = 3480 * bigScale;
