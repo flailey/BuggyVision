@@ -1,5 +1,5 @@
 %tests frames with feature extractors
-
+close
 vid = VideoReader('../data/large/mobot1.mov');
 
 %F = createFilterBank();
@@ -9,6 +9,12 @@ numFrames = vid.NumberOfFrames;
 %numFrames = 200;
 % constants
 tilt = -1 * degtorad(0.05) / scale;
+
+bigScale = 0.2;
+% known size
+bigFlatSize = [2160 * bigScale, 3480 * bigScale, 3];
+flatWidth = 3480 * bigScale;
+flatHeight = 2160 * bigScale;
 
 %mask = imread('../data/IcarusMask1.png');
 %mask = double(im2bw(mask,0.5));
@@ -30,18 +36,24 @@ if(loadVideo == 1)
     end
 end
 
-map = zeros(vid.Width * 2, vid.Height * 10, 3);
+map = uint8(zeros(flatHeight * 10, flatWidth * 2, 3));
+mapH = [1,0,flatWidth * 0.5;
+    0,1,flatHeight*8.75;
+    0,0,1];
 
 k = 1;
 for i = 1:10:numFrames
     
     %frame1 = read(vid, fNum + i);
     %tic;
-    frame1 = mov(k).cdata; %read(vid, fNum + i);
+    bigframe1 = mov(k).cdata; %read(vid, fNum + i);
+    
     k = k + 1;
     %frame1 = readFrame(vid);
     %toc
-    frame1 = imresize(frame1, scale);
+    frame1 = imresize(bigframe1, scale);
+    
+    bigframe1 = imresize(bigframe1, bigScale);
     
     % load, mask, and transform frame 1
     frame1 = transformToFlatMobot(frame1,tilt,0);
@@ -83,11 +95,11 @@ for i = 1:10:numFrames
     
     
     % generate a combined image from the 2 most recent images
-    matches = [1:matchedPoints1.Count;1:matchedPoints1.Count]';
+    matches = [1:matchedPoints1.Count; 1:matchedPoints1.Count]';
     locs1 = matchedPoints1.Location;
     locs2 = matchedPoints2.Location;
     nIter = 100;
-    tol = 1;
+    tol = 10 * scale;
     %[bestH, bestError, inliers] = ransacH(matches, locs2, locs1, nIter, tol);
     %p = generatePanorama(I1,I2);
     %pan = stitchImages(I2, I1);
@@ -95,23 +107,37 @@ for i = 1:10:numFrames
     %wI1 = warpH(frame1,double(bestH),size(I1),0);
     [bestH, bestError, inliers] = ransacAffineH(matches, locs1, locs2, nIter, tol);
     %findTransform([locs1';locs2']);
-    
-    wI1 = affineH(frame1,double(bestH),size(I1),0);
+    bestH(1:2,3) = bestH(1:2,3)./scale * bigScale;
+    %bestH(3,:) = [0,0,1];
+    bigFlatFrame1 = transformToFlatMobot(bigframe1,tilt * scale / bigScale,0);
+    wI1 = affineH(bigFlatFrame1, double(bestH), size(bigFlatFrame1),0);
     
     % visualize ransac'd points
     indicies = find(inliers);
     
-    p = wI1 .* 0.5 + frame2 .*0.5;
+    %p = wI1 .* 0.5 + frame2 .*0.5;
     %figure(1);
     %ax = axes;
     %showMatchedFeatures(wI1, I2, matchedPoints1, matchedPoints2,'Parent',ax);
     %figure(2);
     
+    figure(3);
     ax = axes;
-    showMatchedFeatures(wI1, I2, matchedPoints1(indicies), matchedPoints2(indicies),'Parent',ax);
+    fprintf('gogogo\n');
+    %imshow(transformToFlatMobot(bigframe1,tilt * scale,0));
+    mp1 = matchedPoints1(indicies);
+    mp1.Location = mp1.Location .* (1/scale);
+    mp2 = matchedPoints2(indicies);
+    mp2.Location = mp2.Location .* (1/scale);
+    %showMatchedFeatures(wI1, transformToFlatMobot(bigframe2, tilt * scale, 0), mp1, mp2,'Parent',ax);
     %imshow(p);
     
+    %%% pad image to match size of map %%%
     
+    mapH = double(mapH * bestH);
+    wmap = affineH(bigFlatFrame1, mapH, size(map),0);
+    map = max(map,wmap);
+    imshow(map);
     
     drawnow;
     
@@ -121,6 +147,7 @@ for i = 1:10:numFrames
     vpts2 = vpts1;
     I2 = I1;
     frame2 = frame1;
+    bigframe2 = bigframe1;
     
 end
 hold off;
