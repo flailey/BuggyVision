@@ -3,22 +3,44 @@
 vid = VideoReader('../data/large/mobot1.mov');
 
 %F = createFilterBank();
-scale = 0.5;
+scale = 0.1;
 fNum = 1; % 1300
-numFrames = 200;
+numFrames = vid.NumberOfFrames;
+%numFrames = 200;
 % constants
 tilt = -1 * degtorad(0.05) / scale;
-
-
-
 
 %mask = imread('../data/IcarusMask1.png');
 %mask = double(im2bw(mask,0.5));
 
+loadVideo = 0;
+
+if(loadVideo == 1)
+    vidWidth = vid.Width;
+    vidHeight = vid.Height;
+    mov = struct('cdata',zeros(vidHeight,vidWidth,3,'uint8'));
+
+    %%% preload the video %%%
+
+    k = 1;
+    for i = 1:10:numFrames
+        mov(k).cdata = read(vid, fNum + i); %readFrame(xyloObj);
+        k = k+1;
+        fprintf('%d\n',k);
+    end
+end
+
+map = zeros(vid.Width * 2, vid.Height * 10, 3);
+
+k = 1;
 for i = 1:10:numFrames
     
-    frame1 = read(vid, fNum + i);
-    
+    %frame1 = read(vid, fNum + i);
+    %tic;
+    frame1 = mov(k).cdata; %read(vid, fNum + i);
+    k = k + 1;
+    %frame1 = readFrame(vid);
+    %toc
     frame1 = imresize(frame1, scale);
     
     % load, mask, and transform frame 1
@@ -28,12 +50,12 @@ for i = 1:10:numFrames
     
     %I = imadjust(I,stretchlim(I),[]);
     %I = edge(I, 'canny', 0.01);
-    points = detectBRISKFeatures(I1);
+    %points = detectBRISKFeatures(I1);
     %corners = detectFASTFeatures(I1);
     %regions = detectMSERFeatures(frame1);
-    %points = detectSURFFeatures(I);
-    %points = detectHarrisFeatures(I);
-    %points = detectMinEigenFeatures(I);
+    %points = detectSURFFeatures(I1);
+    %points = detectHarrisFeatures(I1);
+    points = detectMinEigenFeatures(I1);
     %[f1, vpts1, hogVisualization] = extractHOGFeatures(wFrame1, regions);
     
     [f1, vpts1] = extractFeatures(I1, points);
@@ -65,7 +87,7 @@ for i = 1:10:numFrames
     locs1 = matchedPoints1.Location;
     locs2 = matchedPoints2.Location;
     nIter = 100;
-    tol = 5;
+    tol = 1;
     %[bestH, bestError, inliers] = ransacH(matches, locs2, locs1, nIter, tol);
     %p = generatePanorama(I1,I2);
     %pan = stitchImages(I2, I1);
@@ -79,7 +101,6 @@ for i = 1:10:numFrames
     % visualize ransac'd points
     indicies = find(inliers);
     
-    
     p = wI1 .* 0.5 + frame2 .*0.5;
     %figure(1);
     %ax = axes;
@@ -89,6 +110,9 @@ for i = 1:10:numFrames
     ax = axes;
     showMatchedFeatures(wI1, I2, matchedPoints1(indicies), matchedPoints2(indicies),'Parent',ax);
     %imshow(p);
+    
+    
+    
     drawnow;
     
     %k = waitforbuttonpress;
