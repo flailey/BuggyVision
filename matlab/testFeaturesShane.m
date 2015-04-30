@@ -1,6 +1,13 @@
 %tests frames with feature extractors
 close
 vid = VideoReader('../data/large/mobot1.mov');
+myVideo = VideoWriter('../outputs/mappingVideo.avi');
+uncompressedVideo = VideoWriter('myfile.avi', 'Uncompressed AVI');
+
+myVideo.FrameRate = 5;  % Default 30
+myVideo.Quality = 75;    % Default 75
+
+open(myVideo);
 
 %F = createFilterBank();
 scale = 0.1;
@@ -10,7 +17,7 @@ numFrames = vid.NumberOfFrames;
 % constants
 tilt = -1 * degtorad(0.05) / scale;
 
-bigScale = 1;
+bigScale = 0.2;
 % known size
 bigFlatSize = [2160 * bigScale, 3480 * bigScale, 3];
 flatWidth = 3480 * bigScale;
@@ -19,9 +26,11 @@ flatHeight = 2160 * bigScale;
 %mask = imread('../data/IcarusMask1.png');
 %mask = double(im2bw(mask,0.5));
 
-loadVideo = 0;
+%m = ones(size(bigFrame1));
+%wMask = transformToFlatMobot(m,tilt * bigScale,0);
 
-if(loadVideo == 1)
+
+if(not(exist('mov','var')))
     vidWidth = vid.Width;
     vidHeight = vid.Height;
     mov = struct('cdata',zeros(vidHeight,vidWidth,3,'uint8'));
@@ -35,25 +44,33 @@ if(loadVideo == 1)
         fprintf('%d\n',k);
     end
 end
-
-map = uint8(zeros(flatHeight * 10, flatWidth * 2, 3));
+hdiv = .75;
+vdiv = .5;
+%map = uint8(zeros(flatHeight * 10, flatWidth * 2, 3));
+map = double(zeros(flatHeight * 10, flatWidth * 2, 3));
 mapH = [1,0,flatWidth * 0.5;
     0,1,flatHeight*8.75;
     0,0,1];
+vframes = struct('vframes',zeros(1024,768,3,'uint8'));
+h = figure('Position', [100, 100, 800, 800]);
+whitebg('black')
 
-k = 1;
-for i = 1:10:numFrames
+for i = 1:size(mov,2);
     
     %frame1 = read(vid, fNum + i);
     %tic;
-    bigframe1 = mov(k).cdata; %read(vid, fNum + i);
+    bigframe1 = mov(i).cdata; %read(vid, fNum + i);
     
-    k = k + 1;
+    
     %frame1 = readFrame(vid);
     %toc
     frame1 = imresize(bigframe1, scale);
     
     bigframe1 = imresize(bigframe1, bigScale);
+    
+    m = ones(size(bigframe1));
+    wMask = transformToFlatMobot(m,tilt * scale / bigScale,0);
+
     
     % load, mask, and transform frame 1
     frame1 = transformToFlatMobot(frame1,tilt,0);
@@ -122,8 +139,12 @@ for i = 1:10:numFrames
     %showMatchedFeatures(wI1, I2, matchedPoints1, matchedPoints2,'Parent',ax);
     %figure(2);
     
-    figure(3);
-    ax = axes;
+    %ax = axes;
+    %subplot(2,2,1);
+    subplot('Position',[0 vdiv hdiv vdiv]);
+    imshow(mov(i).cdata);
+    
+    
     fprintf('gogogo\n');
     %imshow(transformToFlatMobot(bigframe1,tilt * scale,0));
     mp1 = matchedPoints1(indicies);
@@ -131,7 +152,10 @@ for i = 1:10:numFrames
     mp2 = matchedPoints2(indicies);
     mp2.Location = mp2.Location .* (1/scale) * bigScale;
     %bigWI1 = affineH(bigFlatFrame1, double(bestH), size(bigFlatFrame1),0);
-    showMatchedFeatures(wI1, bigFlatFrame2, mp1, mp2,'Parent',ax);
+    %subplot(2,2,3);
+    subplot('Position',[0 0 hdiv (1-vdiv)]);
+    %ax = axes;
+    showMatchedFeatures(wI1, bigFlatFrame2, mp1, mp2);
     %imshow(p);
     
     %%% pad image to match size of map %%%
@@ -140,23 +164,40 @@ for i = 1:10:numFrames
     wmap = affineH(bigFlatFrame1, mapH, size(map),0);
     
     %map = max(map,wmap);
+    mask = affineH(wMask, mapH, size(map), 0);
     
-    mask = double(sum(wmap,3) <= 50);
-    f = fspecial('gaussian', size(mask), 5.0); 
-    mask = imfilter(mask, f);
+    
+    %mask = mask .* repmat(sum(wmap,3) > 150,[1,1,3]);
+    %mask = mask .* repmat(sum(wmap,3) < (sum(map,3) + 100),[1,1,3]);
+    
+    
+    %mask = double(sum(wmap,3) <= 50);
+    %f = fspecial('gaussian', size(mask), 5.0); 
+    %mask = imfilter(mask, f);
     %imagesc(mask);
-    mask = uint8(mask > 0.1);
+    %mask = uint8(mask > 0.1);
     
-    map(:,:,1) = map(:,:,1) .* mask;
-    map(:,:,2) = map(:,:,2) .* mask;
-    map(:,:,3) = map(:,:,3) .* mask;
+    map = map .* (-mask + 1);
     
-    map = map + wmap;
+    % don't replace pixels if new value < 100 (r, g, or b) so we get rid of
+    % shadow
     
-    imshow(map);
+    %imagesc(-mask + 1);
+    %map(:,:,2) = map(:,:,2) .* (-mask + 1);
+    %map(:,:,3) = map(:,:,3) .* (-mask + 1);
+    
+    map = map + double(wmap);
+    %subplot(2,2,[2,4]);
+    subplot('Position',[hdiv 0 (1-hdiv) 1]);
+    imshow(uint8(map));
     
     
     drawnow;
+    
+    %vframes(i).vframes = getimage(h);
+    %subplot(1,1,1);
+    f = getframe(h);
+    writeVideo(myVideo, f.cdata);
     
     %k = waitforbuttonpress;
     end
@@ -168,4 +209,5 @@ for i = 1:10:numFrames
     bigFlatFrame2 = bigFlatFrame1;
     
 end
+close(myVideo);
 hold off;
